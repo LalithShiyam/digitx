@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 interface Node {
   x: number;
@@ -23,6 +23,8 @@ const ParticleSwarm = () => {
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
   const animationRef = useRef<number>();
   const timeRef = useRef(0);
+  const sizeRef = useRef({ width: 0, height: 0 });
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   // Neon spectrum colors
   const colors = [
@@ -86,7 +88,7 @@ const ParticleSwarm = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const { width, height } = canvas;
+    const { width, height } = sizeRef.current;
     const mouse = mouseRef.current;
     timeRef.current += 0.016;
     const time = timeRef.current;
@@ -250,13 +252,36 @@ const ParticleSwarm = () => {
   }, []);
 
   useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handlePrefChange = () => setPrefersReducedMotion(media.matches);
+    handlePrefChange();
+    media.addEventListener('change', handlePrefChange);
+    return () => media.removeEventListener('change', handlePrefChange);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      initNodes(canvas.width, canvas.height);
+      const dpr = window.devicePixelRatio || 1;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      sizeRef.current = { width, height };
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      initNodes(width, height);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -282,7 +307,7 @@ const ParticleSwarm = () => {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [animate, initNodes]);
+  }, [animate, initNodes, prefersReducedMotion]);
 
   return (
     <canvas

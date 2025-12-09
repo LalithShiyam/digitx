@@ -33,6 +33,7 @@ const NetworkGraph = () => {
   });
   const storyIndexRef = useRef(0);
   const [isDark, setIsDark] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const checkDarkMode = () => setIsDark(document.documentElement.classList.contains('dark'));
@@ -43,6 +44,19 @@ const NetworkGraph = () => {
   }, []);
 
   useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = () => setPrefersReducedMotion(media.matches);
+    updatePreference();
+    media.addEventListener('change', updatePreference);
+    return () => media.removeEventListener('change', updatePreference);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -492,7 +506,7 @@ const NetworkGraph = () => {
       document.removeEventListener('click', onClick);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [isDark]);
+  }, [isDark, prefersReducedMotion]);
 
   return (
     <canvas 

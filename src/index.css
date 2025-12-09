@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -30,10 +30,32 @@
     --footer-text: 40 30% 95%;
     
     --card-shadow: 25 30% 20%;
-    
+
     --radius: 1rem;
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+
+    /* Tokens expected by shadcn/tailwind config */
+    --background: var(--bg-primary);
+    --foreground: var(--text-primary);
+    --card: var(--bg-primary);
+    --card-foreground: var(--text-primary);
+    --popover: var(--bg-primary);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--accent);
+    --primary-foreground: 0 0% 100%;
+    --secondary: var(--sage);
+    --secondary-foreground: 40 33% 97%;
+    --muted: 35 18% 90%;
+    --muted-foreground: var(--text-secondary);
+    --accent-foreground: 40 33% 97%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --input: var(--border);
+    --ring: var(--accent);
+    --particle-primary: 215 90% 65%;
+    --particle-secondary: 267 70% 70%;
+    --particle-tertiary: 15 85% 65%;
   }
 
   .dark {
@@ -59,8 +81,30 @@
     --nav-bg: 225 25% 6%;
     --footer-bg: 225 28% 4%;
     --footer-text: 40 25% 96%;
-    
+
     --card-shadow: 225 50% 3%;
+
+    /* Tokens expected by shadcn/tailwind config */
+    --background: var(--bg-primary);
+    --foreground: var(--text-primary);
+    --card: var(--bg-secondary);
+    --card-foreground: var(--text-primary);
+    --popover: var(--bg-secondary);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--accent);
+    --primary-foreground: 40 25% 96%;
+    --secondary: var(--sage);
+    --secondary-foreground: 225 25% 6%;
+    --muted: 225 18% 18%;
+    --muted-foreground: var(--text-secondary);
+    --accent-foreground: 225 25% 6%;
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 40 25% 96%;
+    --input: var(--border);
+    --ring: var(--accent);
+    --particle-primary: 18 70% 60%;
+    --particle-secondary: 325 65% 65%;
+    --particle-tertiary: 210 70% 62%;
   }
 }
 
@@ -315,6 +359,155 @@
     transform: translateY(-2px);
   }
 
+  /* Hero side cards */
+  .hero-side-card {
+    background: linear-gradient(135deg, hsl(var(--bg-primary)), hsl(var(--bg-secondary)));
+    border: 1px solid hsl(var(--border));
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    box-shadow: 0 20px 60px hsl(var(--card-shadow) / 0.1);
+    backdrop-filter: blur(12px);
+  }
+
+  .pill-soft {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: hsl(var(--accent) / 0.08);
+    color: hsl(var(--accent));
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .bullet-dot {
+    width: 10px;
+    height: 10px;
+    margin-top: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, hsl(var(--accent)), hsl(var(--accent) / 0.4));
+    box-shadow: 0 0 0 6px hsl(var(--accent) / 0.08);
+    flex-shrink: 0;
+  }
+
+  .evidence-card {
+    background: hsl(var(--bg-primary));
+    border: 1px solid hsl(var(--border));
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+    box-shadow: 0 18px 50px hsl(var(--card-shadow) / 0.12);
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .status-chip {
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: hsl(var(--accent) / 0.1);
+    color: hsl(var(--accent));
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .evidence-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0.5rem;
+    align-items: start;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed hsl(var(--border));
+  }
+  .evidence-row:last-child { border-bottom: none; }
+  .evidence-row .label {
+    font-size: 0.85rem;
+    color: hsl(var(--text-muted));
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .evidence-row .value {
+    font-size: 0.95rem;
+    color: hsl(var(--text-primary));
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    .evidence-row { grid-template-columns: 1fr; }
+  }
+
+  /* Floating trust rail */
+  .floating-rail {
+    width: 320px;
+    background: hsl(var(--bg-primary) / 0.9);
+    border: 1px solid hsl(var(--border));
+    border-radius: 1.25rem;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 24px 70px hsl(var(--card-shadow) / 0.18);
+    backdrop-filter: blur(10px);
+  }
+  .rail-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: hsl(var(--accent));
+    box-shadow: 0 0 0 6px hsl(var(--accent) / 0.1);
+  }
+  .rail-sep {
+    width: 1px;
+    height: 14px;
+    background: hsl(var(--border-strong));
+  }
+
+  /* Hoverable list rows */
+  .list-hover {
+    border-radius: 0.75rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    padding: 0.5rem 0.75rem;
+  }
+  .list-hover:hover {
+    background: hsl(var(--accent) / 0.08);
+    border: 1px solid hsl(var(--accent) / 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Focus stack cards */
+  .focus-card {
+    position: relative;
+    padding: 1.4rem 1.75rem;
+    border-radius: 1.5rem;
+    border: 1px solid hsl(var(--border));
+    background: linear-gradient(135deg, hsl(var(--bg-primary)), hsl(var(--bg-secondary)));
+    box-shadow: 0 12px 36px hsl(var(--card-shadow) / 0.12);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .focus-card:hover {
+    transform: translateY(-4px);
+    border-color: hsl(var(--accent) / 0.4);
+    box-shadow: 0 18px 46px hsl(var(--card-shadow) / 0.16);
+  }
+
+  .focus-card-number {
+    position: absolute;
+    left: 1rem;
+    top: 1.1rem;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: hsl(var(--accent));
+  }
+
+  .focus-card-example {
+    margin-top: 0.4rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.85rem;
+    background: hsl(var(--accent) / 0.06);
+    color: hsl(var(--text-secondary));
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+
+
   /* Cards - Elevated design */
   .pillar-card {
     position: relative;
@@ -401,6 +594,7 @@
     0%, 100% { transform: translateY(0); opacity: 0.4; }
     50% { transform: translateY(8px); opacity: 0.8; }
   }
+
 
   /* Marquee for subtle movement */
   .marquee-track {
