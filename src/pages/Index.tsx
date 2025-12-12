@@ -87,7 +87,7 @@ const Index = () => {
     },
     {
       name: 'FALCON',
-      desc: 'One-stop total-body PET motion correction using a greedy diffeomorphic registration engine.',
+      desc: 'One-stop total-body PET motion correction using the greedy diffeomorphic registration engine.',
       tags: ['PET/CT', 'Motion correction', 'Registration'],
       status: 'Stable',
       github: 'https://github.com/ENHANCE-PET/FALCON',
