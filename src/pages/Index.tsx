@@ -53,7 +53,7 @@ const Index = () => {
       name: 'MosaicX',
       desc: 'Autonomous structuring engine that turns PDFs, dictated notes, images, and labs into FHIR-ready, provenance-preserved data.',
       tags: ['FHIR', 'SNOMED/LOINC', 'Provenance', 'Pipelines'],
-      status: 'Active development',
+      status: 'In development',
       github: 'https://github.com/DIGIT-X-Lab/MOSAICX',
       stars: 3,
     },
@@ -61,7 +61,7 @@ const Index = () => {
       name: 'AnnotateX',
       desc: 'GUI web app for rapid text annotation to build gold standards and evaluate structured extraction.',
       tags: ['Annotation', 'Quality', 'Gold standards'],
-      status: 'Active development',
+      status: 'In development',
       github: 'https://github.com/DIGIT-X-Lab/ANNOTATEX',
       stars: 2,
     },
@@ -69,7 +69,7 @@ const Index = () => {
       name: 'KnowledgeX',
       desc: 'A discovery platform that builds graphs from unstructured text with LLMs and supports grounded chat over the graph.',
       tags: ['Knowledge graph', 'LLM-grounding', 'Reasoning'],
-      status: 'Active development',
+      status: 'In development',
       github: 'https://github.com/DIGIT-X-Lab/KnowledgeX',
       stars: 0,
     },
@@ -80,7 +80,7 @@ const Index = () => {
       name: 'MOOSE',
       desc: 'Segments 130+ tissues from CT using nnU-Net; built for multicenter PET/CT workflows and opportunistic screening.',
       tags: ['PET/CT', 'Segmentation', 'Multicenter'],
-      status: 'Maintained',
+      status: 'Stable',
       github: 'https://github.com/ENHANCE-PET/MOOSE',
       paper: 'https://pubmed.ncbi.nlm.nih.gov/35772962/',
       stars: 299,
@@ -89,7 +89,7 @@ const Index = () => {
       name: 'FALCON',
       desc: 'One-stop total-body PET motion correction using a greedy diffeomorphic registration engine.',
       tags: ['PET/CT', 'Motion correction', 'Registration'],
-      status: 'Maintained',
+      status: 'Stable',
       github: 'https://github.com/ENHANCE-PET/FALCON',
       paper: 'https://pubmed.ncbi.nlm.nih.gov/37290795/',
       stars: 48,
@@ -98,43 +98,56 @@ const Index = () => {
       name: 'PUMA',
       desc: 'PET segmentation–guided diffeomorphic framework for multiplexing tracers to characterise tissue biology.',
       tags: ['PET/CT', 'Segmentation', 'Diffeomorphic'],
-      status: 'Maintained',
+      status: 'Stable',
       github: 'https://github.com/ENHANCE-PET/PUMA',
       paper: 'https://jnm.snmjournals.org/content/early/2025/09/18/jnumed.125.269688',
       stars: 21,
     },
   ];
 
-  const focusIcons = [
-    (
-      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 4h16v6H4z" />
-        <path d="M8 14h12M8 18h8" />
-        <circle cx="6" cy="16" r="2" />
-      </svg>
-    ),
-    (
-      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="8" cy="12" r="3" />
-        <circle cx="16" cy="6" r="2" />
-        <circle cx="16" cy="18" r="2" />
-        <path d="M10.5 10.5 14.5 7.5M10.5 13.5l4 2.5" />
-      </svg>
-    ),
-    (
-      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="4" y="5" width="12" height="14" rx="2" />
-        <path d="M16 9h3v6h-3" />
-        <path d="M8 9h4M8 13h2" />
-      </svg>
-    ),
-    (
-      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 7h8l2 4 4 2-2 4H6l-2-4z" />
-        <path d="M10 4v3M6 18v2M14 18v2" />
-      </svg>
-    ),
-  ];
+  const initialStarCounts = [...tools, ...imagingTools].reduce<Record<string, number>>((acc, tool) => {
+    if (tool.github && typeof tool.stars === 'number') {
+      acc[tool.github] = tool.stars;
+    }
+    return acc;
+  }, {});
+
+  const [starCounts, setStarCounts] = useState<Record<string, number>>(initialStarCounts);
+
+  useEffect(() => {
+    const repos = Array.from(new Set([...tools, ...imagingTools].map(t => t.github).filter(Boolean))) as string[];
+    if (!repos.length) return;
+
+    let cancelled = false;
+    const fetchStars = async () => {
+      const updates: [string, number][] = [];
+      await Promise.all(
+        repos.map(async (repo) => {
+          try {
+            const path = new URL(repo).pathname.slice(1);
+            const res = await fetch(`https://api.github.com/repos/${path}`);
+            if (!res.ok) return;
+            const data = await res.json();
+            if (typeof data?.stargazers_count === 'number') {
+              updates.push([repo, data.stargazers_count]);
+            }
+          } catch {
+            /* ignore */
+          }
+        })
+      );
+
+      if (cancelled || !updates.length) return;
+      setStarCounts(prev => {
+        const next = { ...prev };
+        updates.forEach(([repo, stars]) => { next[repo] = stars; });
+        return next;
+      });
+    };
+
+    fetchStars();
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <div className="relative min-h-screen noise-overlay">
@@ -314,32 +327,39 @@ const Index = () => {
               {imagingTools.map((tool) => (
                 <div key={tool.name} className="focus-card h-full flex flex-col">
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-headline text-xl text-[hsl(var(--text-primary))]">{tool.name}</h3>
-                      {tool.github && (
-                        <a href={tool.github} className="icon-inline" target="_blank" rel="noopener noreferrer" aria-label={`${tool.name} on GitHub`}>
-                          <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.94.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.72.08-.71.08-.71 1.15.08 1.75 1.18 1.75 1.18 1.02 1.74 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.52-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.44-2.27 1.16-3.07-.12-.29-.5-1.46.11-3.05 0 0 .95-.3 3.12 1.17a10.9 10.9 0 0 1 5.68 0c2.17-1.47 3.12-1.17 3.12-1.17.61 1.59.23 2.76.11 3.05.72.8 1.16 1.82 1.16 3.07 0 4.41-2.68 5.38-5.23 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.21.67.79.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
-                          </svg>
-                          <span>{tool.stars}</span>
-                        </a>
-                      )}
-                      {tool.paper && (
-                        <a href={tool.paper} className="icon-inline" target="_blank" rel="noopener noreferrer" aria-label={`${tool.name} publication`}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                            <path d="M4 19.5V5a2 2 0 0 1 2-2h9" />
-                            <path d="M16 3h2a2 2 0 0 1 2 2v14.5l-3-1.5-3 1.5V5a2 2 0 0 1 2-2Z" />
-                          </svg>
-                        </a>
-                      )}
-                    </div>
+                    <h3 className="text-headline text-xl text-[hsl(var(--text-primary))]">{tool.name}</h3>
                     <span className="status-chip">{tool.status}</span>
                   </div>
-                  <p className="text-[hsl(var(--text-secondary))] leading-relaxed mb-4 flex-1">{tool.desc}</p>
                   <div className="flex flex-wrap gap-2 mb-3">
                     {tool.tags.map((tag) => (
                       <span key={tag} className="pill-soft text-xs">{tag}</span>
                     ))}
+                  </div>
+                  <p className="text-[hsl(var(--text-secondary))] leading-relaxed mb-4 flex-1">{tool.desc}</p>
+                  <div className="flex items-center justify-between gap-3 text-xs text-[hsl(var(--text-secondary))] mt-auto">
+                    {tool.github && (
+                      <a href={tool.github} className="icon-inline" target="_blank" rel="noopener noreferrer" aria-label={`${tool.name} on GitHub`}>
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                          <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.94.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.72.08-.71.08-.71 1.15.08 1.75 1.18 1.75 1.18 1.02 1.74 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.52-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.44-2.27 1.16-3.07-.12-.29-.5-1.46.11-3.05 0 0 .95-.3 3.12 1.17a10.9 10.9 0 0 1 5.68 0c2.17-1.47 3.12-1.17 3.12-1.17.61 1.59.23 2.76.11 3.05.72.8 1.16 1.82 1.16 3.07 0 4.41-2.68 5.38-5.23 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.21.67.79.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+                        </svg>
+                        <span className="flex items-center gap-1.5">
+                          GitHub
+                          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m12 3 2.4 5.5 5.6.4-4.3 3.7 1.4 5.5L12 15.7 7 18.1l1.3-5.5-4.3-3.7 5.6-.4z" />
+                          </svg>
+                          {starCounts[tool.github] ?? tool.stars ?? 0}
+                        </span>
+                      </a>
+                    )}
+                    {tool.paper && (
+                      <a href={tool.paper} className="icon-inline" target="_blank" rel="noopener noreferrer" aria-label={`${tool.name} publication`}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                          <path d="M4 19.5V5a2 2 0 0 1 2-2h9" />
+                          <path d="M16 3h2a2 2 0 0 1 2 2v14.5l-3-1.5-3 1.5V5a2 2 0 0 1 2-2Z" />
+                        </svg>
+                        <span>Paper</span>
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
@@ -352,24 +372,39 @@ const Index = () => {
               {tools.map((tool) => (
                 <div key={tool.name} className="focus-card h-full flex flex-col">
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-headline text-xl text-[hsl(var(--text-primary))]">{tool.name}</h3>
-                      {tool.github && (
-                        <a href={tool.github} className="icon-inline" target="_blank" rel="noopener noreferrer" aria-label={`${tool.name} on GitHub`}>
-                          <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.94.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.72.08-.71.08-.71 1.15.08 1.75 1.18 1.75 1.18 1.02 1.74 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.52-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.44-2.27 1.16-3.07-.12-.29-.5-1.46.11-3.05 0 0 .95-.3 3.12 1.17a10.9 10.9 0 0 1 5.68 0c2.17-1.47 3.12-1.17 3.12-1.17.61 1.59.23 2.76.11 3.05.72.8 1.16 1.82 1.16 3.07 0 4.41-2.68 5.38-5.23 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.21.67.79.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
-                          </svg>
-                          <span>{tool.stars}</span>
-                        </a>
-                      )}
-                    </div>
+                    <h3 className="text-headline text-xl text-[hsl(var(--text-primary))]">{tool.name}</h3>
                     <span className="status-chip">{tool.status}</span>
                   </div>
-                  <p className="text-[hsl(var(--text-secondary))] leading-relaxed mb-4 flex-1">{tool.desc}</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-3">
                     {tool.tags.map((tag) => (
                       <span key={tag} className="pill-soft text-xs">{tag}</span>
                     ))}
+                  </div>
+                  <p className="text-[hsl(var(--text-secondary))] leading-relaxed mb-4 flex-1">{tool.desc}</p>
+                  <div className="flex items-center gap-2 text-xs text-[hsl(var(--text-secondary))] mt-auto">
+                    {tool.github && (
+                      <a href={tool.github} className="icon-inline" target="_blank" rel="noopener noreferrer" aria-label={`${tool.name} on GitHub`}>
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                          <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.94.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.72.08-.71.08-.71 1.15.08 1.75 1.18 1.75 1.18 1.02 1.74 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.52-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.44-2.27 1.16-3.07-.12-.29-.5-1.46.11-3.05 0 0 .95-.3 3.12 1.17a10.9 10.9 0 0 1 5.68 0c2.17-1.47 3.12-1.17 3.12-1.17.61 1.59.23 2.76.11 3.05.72.8 1.16 1.82 1.16 3.07 0 4.41-2.68 5.38-5.23 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.21.67.79.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+                        </svg>
+                        <span className="flex items-center gap-1.5">
+                          GitHub
+                          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m12 3 2.4 5.5 5.6.4-4.3 3.7 1.4 5.5L12 15.7 7 18.1l1.3-5.5-4.3-3.7 5.6-.4z" />
+                          </svg>
+                          {starCounts[tool.github] ?? tool.stars ?? 0}
+                        </span>
+                      </a>
+                    )}
+                    {tool.paper && (
+                      <a href={tool.paper} className="icon-inline" target="_blank" rel="noopener noreferrer" aria-label={`${tool.name} publication`}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                          <path d="M4 19.5V5a2 2 0 0 1 2-2h9" />
+                          <path d="M16 3h2a2 2 0 0 1 2 2v14.5l-3-1.5-3 1.5V5a2 2 0 0 1 2-2Z" />
+                        </svg>
+                        <span>Paper</span>
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
