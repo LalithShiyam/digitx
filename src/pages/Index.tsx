@@ -188,7 +188,7 @@ const Index = () => {
               At DIGITX, we envision a future where no clinician faces uncertainty because of fragmented data, and no researcher loses precious time struggling to harmonize information. We’re building a world where medical insights flow freely, letting clinicians and researchers focus on what matters most — transforming lives.
             </p>
             <p className={`text-lg md:text-xl text-[hsl(var(--text-secondary))] leading-[1.9] max-w-4xl mb-8 ${isLoaded ? 'fade-in-up delay-3' : 'opacity-0'}`}>
-              DIGITX is an academic lab in Radiology at LMU Klinikum. We build the quiet, rigorous infrastructure that turns raw clinical signals into structured, connected evidence — so decisions can be explained, challenged, and trusted.
+              DIGITX is an academic lab in Radiology at LMU University Hospital, Munich. We build the quiet, rigorous infrastructure that turns raw clinical signals into structured, connected evidence — so decisions can be explained, challenged, and trusted.
             </p>
             <div className={`flex flex-wrap gap-4 ${isLoaded ? 'fade-in-up delay-4' : 'opacity-0'}`}>
               <a href="#focus" className="btn-primary btn-shimmer">Explore Our Work <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></a>
@@ -482,6 +482,45 @@ const Index = () => {
             <div className="lg:col-span-8 space-y-6">
               <p className="text-lg md:text-xl text-[hsl(var(--text-secondary))] leading-[1.8]">DIGITX is based at the Department of Radiology, LMU University Hospital, Munich. We bring together clinicians, informaticians, engineers, and researchers who care about building upstream foundations that translate to bedside impact. We stay small on purpose so we can stay close to the work.</p>
               <p className="text-lg text-[hsl(var(--text-secondary))] leading-[1.8]">We value clarity over hype, rigor over shortcuts, and an academic culture that keeps patients and colleagues at the center of every decision.</p>
+              <div className="flex flex-wrap items-center gap-3 justify-between">
+                <a
+                  href="https://scholar.google.com/citations?user=ZjZLd-sAAAAJ&hl=de&authuser=2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="View publications on Google Scholar"
+                  className="group inline-flex items-center gap-3 px-3.5 py-2 rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--bg-primary))] text-sm font-semibold text-[hsl(var(--text-primary))] shadow-[0_10px_30px_hsl(var(--card-shadow)/0.12)] hover:bg-[hsl(var(--accent))] hover:text-white hover:border-[hsl(var(--accent))] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))] active:translate-y-0.5"
+                >
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[hsl(var(--accent)/0.14)] text-[hsl(var(--accent))] group-hover:bg-white group-hover:text-[hsl(var(--accent))] transition-colors duration-300">
+                    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m3 10 9-5 9 5-9 5-9-5Z" />
+                      <path d="M12 15v6" />
+                      <path d="M7.5 12.75v3.5" />
+                      <path d="M16.5 12.75v3.5" />
+                    </svg>
+                  </span>
+                  <span>Google Scholar</span>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </a>
+                <a
+                  href="https://github.com/DIGIT-X-Lab"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="View DIGITX on GitHub"
+                  className="group inline-flex items-center gap-3 px-3.5 py-2 rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--bg-primary))] text-sm font-semibold text-[hsl(var(--text-primary))] shadow-[0_10px_30px_hsl(var(--card-shadow)/0.12)] hover:bg-[hsl(var(--accent))] hover:text-white hover:border-[hsl(var(--accent))] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))] active:translate-y-0.5"
+                >
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[hsl(var(--accent)/0.14)] text-[hsl(var(--accent))] group-hover:bg-white group-hover:text-[hsl(var(--accent))] transition-colors duration-300">
+                    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.95.58.11.79-.26.79-.58 0-.29-.01-1.06-.02-2.07-3.2.7-3.88-1.54-3.88-1.54-.53-1.35-1.3-1.71-1.3-1.71-1.06-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.73 1.27 3.4.97.11-.76.41-1.27.75-1.56-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.2-3.09-.12-.29-.52-1.46.11-3.04 0 0 .98-.31 3.2 1.18a11.2 11.2 0 0 1 2.91-.39c.99 0 1.99.13 2.92.39 2.21-1.5 3.19-1.18 3.19-1.18.64 1.58.24 2.75.12 3.04.75.8 1.19 1.83 1.19 3.09 0 4.44-2.69 5.41-5.25 5.69.42.36.8 1.08.8 2.19 0 1.58-.01 2.85-.01 3.24 0 .32.21.7.8.58A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+                    </svg>
+                  </span>
+                  <span>GitHub</span>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </a>
+              </div>
               <div className="pt-6 border-t border-[hsl(var(--border))]">
                 <div className="focus-card">
                   <div className="flex items-center justify-between mb-4">
