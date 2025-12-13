@@ -105,6 +105,13 @@ const Index = () => {
     },
   ];
 
+  const collaborators = [
+    { name: 'Academic Partner', tag: 'University' },
+    { name: 'Clinical Partner', tag: 'Hospital' },
+    { name: 'Industry Collaborator', tag: 'Industry' },
+    { name: 'Research Network', tag: 'Consortium' },
+  ];
+
   const initialStarCounts = [...tools, ...imagingTools].reduce<Record<string, number>>((acc, tool) => {
     if (tool.github && typeof tool.stars === 'number') {
       acc[tool.github] = tool.stars;
@@ -537,6 +544,36 @@ const Index = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Collaborators */}
+      <section id="collaborators" className="relative py-24 md:py-32 px-6 md:px-12 lg:px-20 bg-[hsl(var(--bg-primary))] transition-colors duration-300">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
+            <div>
+              <span className="text-label text-[hsl(var(--accent))] block mb-3">Collaborators</span>
+              <h2 className="text-display text-3xl md:text-4xl text-[hsl(var(--text-primary))]">Trusted Partners</h2>
+              <p className="text-[hsl(var(--text-secondary))] mt-3">Select collaborators across academia, clinics, and industry. Swap these placeholders with approved marks when ready.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
+            {collaborators.map((c) => (
+              <div
+                key={c.name}
+                className="group relative overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--bg-primary))] shadow-[0_12px_35px_hsl(var(--card-shadow)/0.12)] px-4 py-5 flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(var(--accent))]"
+              >
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-[radial-gradient(circle_at_30%_30%,hsl(var(--accent)/0.14),transparent_45%),radial-gradient(circle_at_70%_70%,hsl(var(--accent)/0.12),transparent_45%)] transition-opacity duration-500" />
+                <div className="relative flex flex-col items-center text-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-[hsl(var(--accent)/0.1)] text-[hsl(var(--accent))] flex items-center justify-center font-semibold tracking-tight text-sm group-hover:bg-[hsl(var(--accent))] group-hover:text-white transition-colors duration-300">
+                    {c.name.slice(0, 3).toUpperCase()}
+                  </div>
+                  <div className="text-sm font-semibold text-[hsl(var(--text-primary))]">{c.name}</div>
+                  <span className="pill-soft uppercase tracking-[0.08em] text-[0.6rem]">{c.tag}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
