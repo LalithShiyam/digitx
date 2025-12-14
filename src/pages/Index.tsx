@@ -185,7 +185,7 @@ const Index = () => {
               Shaping Health<br /><span className="text-[hsl(var(--accent))] italic">Intelligence</span>
             </h1>
             <p className={`text-lg md:text-xl text-[hsl(var(--text-secondary))] leading-[1.9] max-w-4xl mb-6 ${isLoaded ? 'fade-in-up delay-2' : 'opacity-0'}`}>
-              At DIGITX, we envision a future where no clinician faces uncertainty because of fragmented data, and no researcher loses precious time struggling to harmonize information. We’re building a world where medical insights flow freely, letting clinicians and researchers focus on what matters most — transforming lives.
+              At DIGITX, we imagine a future where clinicians aren’t slowed by fragmented data and researchers aren’t burdened by disconnected systems. By enabling medical insights to flow freely, we give people back the time and clarity needed to focus on improving lives.
             </p>
             <p className={`text-lg md:text-xl text-[hsl(var(--text-secondary))] leading-[1.9] max-w-4xl mb-8 ${isLoaded ? 'fade-in-up delay-3' : 'opacity-0'}`}>
               DIGITX is an academic lab in Radiology at LMU University Hospital, Munich. We build the quiet, rigorous infrastructure that turns raw clinical signals into structured, connected evidence — so decisions can be explained, challenged, and trusted.
