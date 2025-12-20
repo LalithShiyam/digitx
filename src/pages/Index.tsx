@@ -1,16 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import NetworkGraph from '@/components/NetworkGraph';
 import ThemeToggle from '@/components/ThemeToggle';
 
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
+  const toolsSectionRef = useRef<HTMLElement>(null);
+  const [toolsVisible, setToolsVisible] = useState(false);
+
   useEffect(() => setIsLoaded(true), []);
   useEffect(() => {
     const handleScroll = () => setNavScrolled(window.scrollY > 12);
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Intersection Observer for lazy loading GitHub stars
+  useEffect(() => {
+    const section = toolsSectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setToolsVisible(true); },
+      { rootMargin: '200px' }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
   }, []);
 
   const focusAreas = [
@@ -150,6 +165,8 @@ const Index = () => {
   const [starCounts, setStarCounts] = useState<Record<string, number>>(initialStarCounts);
 
   useEffect(() => {
+    if (!toolsVisible) return;
+
     const repos = Array.from(new Set([...tools, ...imagingTools].map(t => t.github).filter(Boolean))) as string[];
     if (!repos.length) return;
 
@@ -182,7 +199,7 @@ const Index = () => {
 
     fetchStars();
     return () => { cancelled = true; };
-  }, []);
+  }, [toolsVisible]);
 
   return (
     <div className="relative min-h-screen noise-overlay">
@@ -322,23 +339,26 @@ const Index = () => {
       {/* Focus Areas */}
       <section id="focus" className="relative py-32 md:py-48 px-6 md:px-12 lg:px-20 bg-[hsl(var(--bg-secondary))] transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-20 max-w-6xl">
+          <div className="mb-20 max-w-4xl">
             <span className="text-label text-[hsl(var(--accent))] block mb-4">What We Work On</span>
             <h2 className="text-display text-3xl md:text-4xl lg:text-5xl text-[hsl(var(--text-primary))] max-w-3xl">Foundations for <span className="font-serif text-[hsl(var(--accent))] italic">Health Intelligence</span></h2>
-            <p className="text-[hsl(var(--text-secondary))] mt-6 max-w-6xl leading-[1.9]">We focus on a few foundational challenges that must be solved before healthcare can benefit from trustworthy, scalable intelligence. Together, they form a platform where clinical data structures itself, links to what matters, and can be queried with evidence intact.</p>
+            <p className="text-[hsl(var(--text-secondary))] mt-6 max-w-3xl leading-[1.9]">We focus on a few foundational challenges that must be solved before healthcare can benefit from trustworthy, scalable intelligence.</p>
           </div>
 
-          <div className="grid gap-6 max-w-6xl">
-            {focusAreas.map((area) => (
-              <div key={area.num} className="focus-card group">
-                <h3 className="focus-card-title text-headline text-xl md:text-2xl text-[hsl(var(--text-primary))] mb-2 group-hover:text-[hsl(var(--accent))] transition-colors duration-300 flex items-center gap-3">
-                  <span className="focus-num text-[hsl(var(--accent))] font-semibold">{area.num}</span>
-                  <span>{area.title}</span>
-                </h3>
-                <p className="text-[hsl(var(--text-secondary))] leading-relaxed mb-3">{area.desc}</p>
-                {area.example && (
-                  <div className="focus-card-example">{area.example}</div>
-                )}
+          <div className="max-w-6xl">
+            {focusAreas.map((area, idx) => (
+              <div
+                key={area.num}
+                className="focus-area-row group"
+                style={{ animationDelay: `${idx * 100}ms` }}
+              >
+                <div className="focus-area-left">
+                  <span className="focus-area-num">{area.num}</span>
+                </div>
+                <div className="focus-area-right">
+                  <h3 className="focus-area-title">{area.title}</h3>
+                  <p className="text-[hsl(var(--text-secondary))] leading-[1.8] mt-2">{area.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -346,7 +366,7 @@ const Index = () => {
       </section>
 
       {/* Software */}
-      <section id="tools" className="relative py-28 md:py-40 px-6 md:px-12 lg:px-20 transition-colors duration-300">
+      <section ref={toolsSectionRef} id="tools" className="relative py-28 md:py-40 px-6 md:px-12 lg:px-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
           <div className="mb-16 max-w-6xl">
             <span className="text-label text-[hsl(var(--accent))] block mb-4">Software</span>
@@ -358,11 +378,11 @@ const Index = () => {
 
           <div className="mb-14 max-w-7xl mx-auto">
             <span className="text-label text-[hsl(var(--accent))] block mb-3">Imaging Stack</span>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {imagingTools.map((tool) => (
-                <div key={tool.name} className="focus-card h-full flex flex-col">
+                <div key={tool.name} className="software-card h-full flex flex-col">
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <h3 className="text-headline text-xl text-[hsl(var(--text-primary))]">{tool.name}</h3>
+                    <h3 className="software-card-title">{tool.name}</h3>
                     <span className="status-chip">{tool.status}</span>
                   </div>
                   <div className="flex flex-wrap gap-2 mb-3">
@@ -371,7 +391,7 @@ const Index = () => {
                     ))}
                   </div>
                   <p className="text-[hsl(var(--text-secondary))] leading-relaxed mb-4 flex-1">{tool.desc}</p>
-                  <div className="flex items-center justify-between gap-3 text-xs text-[hsl(var(--text-secondary))] mt-auto">
+                  <div className="flex items-center gap-3 text-xs mt-auto">
                     {tool.github && (
                       <a
                         href={tool.github}
@@ -418,11 +438,11 @@ const Index = () => {
 
           <div className="max-w-7xl mx-auto">
             <span className="text-label text-[hsl(var(--accent))] block mb-3">LLM Stack</span>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {tools.map((tool) => (
-                <div key={tool.name} className="focus-card h-full flex flex-col">
+                <div key={tool.name} className="software-card h-full flex flex-col">
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <h3 className="text-headline text-xl text-[hsl(var(--text-primary))]">{tool.name}</h3>
+                    <h3 className="software-card-title">{tool.name}</h3>
                     <span className="status-chip">{tool.status}</span>
                   </div>
                   <div className="flex flex-wrap gap-2 mb-3">
@@ -431,7 +451,7 @@ const Index = () => {
                     ))}
                   </div>
                   <p className="text-[hsl(var(--text-secondary))] leading-relaxed mb-4 flex-1">{tool.desc}</p>
-                  <div className="flex items-center gap-2 text-xs text-[hsl(var(--text-secondary))] mt-auto">
+                  <div className="flex items-center gap-3 text-xs mt-auto">
                     {tool.github && (
                       <a
                         href={tool.github}
@@ -453,23 +473,6 @@ const Index = () => {
                         </span>
                       </a>
                     )}
-                    {tool.paper && (
-                      <a
-                        href={tool.paper}
-                        className="icon-inline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${tool.name} publication`}
-                        title="Open publication"
-                      >
-                        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M7 3h8l3 3v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
-                          <path d="M13 3v6l-2-1-2 1V3" />
-                          <path d="M9 11h6M9 14h6" />
-                        </svg>
-                        <span>Paper</span>
-                      </a>
-                    )}
                   </div>
                 </div>
               ))}
@@ -481,27 +484,29 @@ const Index = () => {
       {/* How We Work */}
       <section id="approach" className="relative py-32 md:py-48 px-6 md:px-12 lg:px-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-12 gap-12 lg:gap-20">
-            <div className="lg:col-span-4">
-              <span className="text-label text-[hsl(var(--accent))] block mb-4">How We Work</span>
-              <h2 className="text-display text-3xl md:text-4xl lg:text-5xl text-[hsl(var(--text-primary))]">
-                <span className="font-serif text-[hsl(var(--text-primary))]">Honest Methods</span><br />
-                <span className="font-serif italic text-[hsl(var(--accent))]">for a Complex Domain</span>
-              </h2>
-            </div>
-            <div className="lg:col-span-8">
-              <ul className="space-y-8">
-                {principles.map((pr, i) => (
-                  <li key={i} className="group flex gap-6 pb-8 border-b border-[hsl(var(--border))] last:border-0 list-hover">
-                    <span className="flex-shrink-0 w-2 h-2 mt-3 rounded-full bg-[hsl(var(--accent))] group-hover:scale-150 transition-transform duration-300" />
-                    <div>
-                      <h3 className="text-headline text-xl text-[hsl(var(--text-primary))] mb-2 group-hover:text-[hsl(var(--accent))] transition-colors duration-300">{pr.title}</h3>
-                      <p className="text-[hsl(var(--text-secondary))] leading-relaxed">{pr.desc}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="mb-20 max-w-4xl">
+            <span className="text-label text-[hsl(var(--accent))] block mb-4">How We Work</span>
+            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl text-[hsl(var(--text-primary))]">
+              <span className="font-serif text-[hsl(var(--text-primary))]">Honest Methods</span><br />
+              <span className="font-serif italic text-[hsl(var(--accent))]">for a Complex Domain</span>
+            </h2>
+          </div>
+
+          <div className="max-w-6xl">
+            {principles.map((pr, i) => (
+              <div
+                key={i}
+                className="principle-row group"
+              >
+                <div className="principle-left">
+                  <span className="principle-num">{String(i + 1).padStart(2, '0')}</span>
+                </div>
+                <div className="principle-right">
+                  <h3 className="principle-title">{pr.title}</h3>
+                  <p className="text-[hsl(var(--text-secondary))] leading-[1.8] mt-2">{pr.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -562,15 +567,15 @@ const Index = () => {
           </div>
 
           {teamMembers.length > 0 && (
-            <div className="relative max-w-7xl divide-y divide-[hsl(var(--border))]">
+            <div className="relative max-w-7xl">
               {teamMembers.map((member, idx) => (
                 <div
                   key={member.name}
-                  className="relative flex flex-col md:flex-row items-start gap-6 md:gap-10 py-6 first:pt-0 last:pb-0"
+                  className="team-member-row relative flex flex-col md:flex-row items-start gap-6 md:gap-10 border-b border-[hsl(var(--border))] last:border-0"
                 >
                   <div className="w-full md:basis-64 shrink-0 space-y-2 relative z-10">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <div className="text-lg font-semibold text-[hsl(var(--text-primary))]">{member.name}</div>
+                      <div className="team-member-name">{member.name}</div>
                     </div>
                     <div className="flex items-center gap-3 flex-wrap">
                       <span className="status-chip">{member.role}</span>
